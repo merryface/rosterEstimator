@@ -83,13 +83,16 @@
 </head>
 <body>
   <h1>Days ON and OFF lists</h1>
-  <p class="instruction">Enter a known first duty day in "Known Day," then add a future date in "Target Date" that is beyond what the roster is currently showing. The standard 6/5 will then be applied, and you will be able to see the estimated days on and off for that period.</p>
+  <p class="instruction">Enter a known first duty day in "Known Day," then add a future date in "Target Date" that is beyond what the roster is currently showing. The standard 6/5 will then be applied, and you will be able to see the estimated days on and off for that period. Uncheck 6/5 for 7/6 roster results.</p>
   <form onsubmit="return false;">
     <label for="knownDay">Known Day:</label>
     <input type="date" id="knownDay" name="knownDay" required><br><br>
 
     <label for="targetDate">Target Date:</label>
     <input type="date" id="targetDate" name="targetDate" required><br><br>
+
+    <input type="checkbox" id="rosterRatio" name="rosterRatio" checked>
+    <label for="rosterRatio">6/5 roster</label><br><br>
 
     <button onclick="estimateRoster()">Estimate Roster</button>
   </form>
@@ -101,7 +104,8 @@
     function estimateRoster() {
       const knownDay = document.getElementById("knownDay").value;
       const targetDate = document.getElementById("targetDate").value;
-      const result = GetRosterDays(knownDay, targetDate);
+      const isFiveSix = document.getElementById("rosterRatio").checked;
+      const result = GetRosterDays(knownDay, targetDate, isFiveSix);
 
       const gridElement = document.getElementById("grid");
       gridElement.innerHTML = "";

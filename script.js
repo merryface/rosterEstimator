@@ -21,7 +21,7 @@ function formatDate(date) {
 }
 
 
-const GetRosterDays = (firstDutyDay, targetDate) => {
+const GetRosterDays = (firstDutyDay, targetDate, isFiveSix) => {
   // Convert known day and target date to JavaScript Date objects
   const knownDate = new Date(firstDutyDay) ;
   const date = new Date(targetDate);
@@ -29,19 +29,25 @@ const GetRosterDays = (firstDutyDay, targetDate) => {
   // Calculate the number of days between the known day and target date
   const dayDifference = Math.floor((date - knownDate) / (1000 * 60 * 60 * 24)) + 1;
 
-  // Define the roster pattern
-  const rosterPattern = [true, true, true, true, true, true, false, false, false, false, false];
+  let rosterPattern;
+  if (isFiveSix) {
+    rosterPattern = [true, true, true, true, true, true, false, false, false, false, false];
+  }
+  if (!isFiveSix) {
+    rosterPattern = [true, true, true, true, true, true, true, false, false, false, false, false, false];
+  }
 
   let daysOn = []
   let daysOff = []
   let currentIndex = 0
 
   for (i=0; i<dayDifference; i += 1) {
-    const currentAssessedDay = formatDate(new Date(knownDate.getFullYear(), knownDate.getMonth(), knownDate.getDate() + i + 1))
+    const currentAssessedDay = formatDate(new Date(knownDate.getFullYear(), knownDate.getMonth(), knownDate.getDate() + i))
     if (rosterPattern[currentIndex]) daysOn.push(currentAssessedDay)
     if (!rosterPattern[currentIndex]) daysOff.push(currentAssessedDay)
     currentIndex += 1
-    if (currentIndex > 10) currentIndex = 0
+    if (isFiveSix && currentIndex > 10) currentIndex = 0
+    if (!isFiveSix && currentIndex > 12) currentIndex = 0
   }
 
   return {
@@ -49,9 +55,3 @@ const GetRosterDays = (firstDutyDay, targetDate) => {
     daysOff
   }
 }
-
-
-
-const knownDay = '2023-07-28';
-const targetDate = '2023-09-09';
-const result = GetRosterDays(knownDay, targetDate);
