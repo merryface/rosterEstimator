@@ -1,0 +1,180 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta http-equiv="X-UA-Compatible" content="IE=edge">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Roster Estimation</title>
+  <style>
+    * {
+      font-family: Verdana, Geneva, Tahoma, sans-serif;
+    }
+
+    .grid-container {
+      display: grid;
+      grid-template-columns: repeat(10, 5fr);
+      grid-gap: 5px;
+    }
+
+    .grid-item {
+      border: 1px solid #ccc;
+      width: 10%;
+      height: 40px;
+      text-align: center;
+      display: inline-block;
+      vertical-align: middle;
+      position: relative;
+    }
+
+    .grid-item p {
+      margin: 0;
+      padding: 0;
+      position: absolute;
+      left: 50%;
+      top: 50%;
+      transform: translate(-50%, -50%);
+    }
+
+    .green {
+      background-color: green;
+      color: white;
+    }
+
+    .blue {
+      background-color: blue;
+      color: white;
+    }
+
+    input[type="date"] {
+      appearance: textfield;
+      padding: 0.5em;
+      font-size: 1rem;
+    }
+
+    label {
+      font-size: 1rem;
+    }
+
+    .instruction {
+      margin-bottom: 3rem;
+    }
+
+    button {
+      display: inline-block;
+      padding: 0.5em 1em;
+      font-size: 16px;
+      font-weight: bold;
+      text-align: center;
+      text-decoration: none;
+      border: none;
+      border-radius: 4px;
+      background-color: #007bff;
+      color: #fff;
+      cursor: pointer;
+      transition: background-color 0.3s ease;
+      margin-bottom: 3rem;
+    }
+
+    button:hover {
+      background-color: #0056b3;
+    }
+  </style>
+  <script src="script.js"></script>
+</head>
+<body>
+  <h1>Days ON and OFF lists</h1>
+  <p class="instruction">Enter a known first duty day in "Known Day," then add a future date in "Target Date" that is beyond what the roster is currently showing. The standard 6/5 will then be applied, and you will be able to see the estimated days on and off for that period.</p>
+  <form onsubmit="return false;">
+    <label for="knownDay">Known Day:</label>
+    <input type="date" id="knownDay" name="knownDay" required><br><br>
+
+    <label for="targetDate">Target Date:</label>
+    <input type="date" id="targetDate" name="targetDate" required><br><br>
+
+    <button onclick="estimateRoster()">Estimate Roster</button>
+  </form>
+
+  <div id="grid"></div>
+  <div id="result"></div>
+
+  <script>
+    function estimateRoster() {
+      const knownDay = document.getElementById("knownDay").value;
+      const targetDate = document.getElementById("targetDate").value;
+      const result = GetRosterDays(knownDay, targetDate);
+
+      const gridElement = document.getElementById("grid");
+      gridElement.innerHTML = "";
+      const startDate = new Date(knownDay);
+      const endDate = new Date(targetDate);
+
+      let previousMonthYear = "";
+      let monthYear = "";
+
+      while (startDate <= endDate) {
+        monthYear = startDate.toLocaleString("en-us", { month: "long", year: "numeric" });
+        const day = startDate.getDate();
+        const weekday = startDate.getDay();
+        const formattedDate = formatDate(startDate);
+
+        if (monthYear !== previousMonthYear) {
+          const monthYearElement = document.createElement("p");
+          monthYearElement.innerHTML = monthYear;
+          monthYearElement.style.fontSize = "1.5rem";
+          monthYearElement.style.fontWeight = "bold";
+          gridElement.appendChild(monthYearElement);
+          previousMonthYear = monthYear;
+        }
+
+        const gridItem = document.createElement("div");
+        gridItem.className = "grid-item";
+
+        if (result.daysOff.includes(formattedDate)) {
+          gridItem.className += " green";
+        } else {
+          gridItem.className += " blue";
+        }
+
+        gridItem.innerHTML = `<p>${day}</p>`;
+        gridElement.appendChild(gridItem);
+
+        startDate.setDate(startDate.getDate() + 1);
+
+        if (startDate.getDate() === 1) {
+          // Insert empty cells to align with the start of the week
+          const remainingDays = 10 - gridElement.childElementCount % 10;
+          if (remainingDays < 10) {
+            for (let i = 0; i < remainingDays; i++) {
+              const emptyCell = document.createElement("div");
+              emptyCell.className = "grid-item";
+              emptyCell.style.visibility = "hidden";
+              gridElement.appendChild(emptyCell);
+            }
+          }
+          if (startDate <= endDate) {
+            const lineBreak = document.createElement("br");
+            gridElement.appendChild(lineBreak);
+          }
+        }
+      }
+
+      const resultElement = document.getElementById("result");
+      resultElement.innerHTML = "<h2>Roster Estimation</h2>";
+      resultElement.innerHTML += "<h3>Days On:</h3>";
+      resultElement.innerHTML += "<ul class='roster-list'>";
+      result.daysOn.forEach((day) => {
+        resultElement.innerHTML += "<li class='roster-item'>" + day + "</li>";
+      });
+      resultElement.innerHTML += "</ul>";
+
+      resultElement.innerHTML += "<h3>Days Off:</h3>";
+      resultElement.innerHTML += "<ul class='roster-list'>";
+      result.daysOff.forEach((day) => {
+        resultElement.innerHTML += "<li class='roster-item'>" + day + "</li>";
+      });
+      resultElement.innerHTML += "</ul>";
+    }
+
+  </script>
+</body>
+</html>
