@@ -82,8 +82,8 @@
   <script src="script.js"></script>
 </head>
 <body>
-  <h1>Days ON and OFF lists</h1>
-  <p class="instruction">Enter a known first duty day in "Known Day," then add a future date in "Target Date" that is beyond what the roster is currently showing. The standard 6/5 will then be applied, and you will be able to see the estimated days on and off for that period. Uncheck 6/5 for 7/6 roster results.</p>
+  <h1>Roster Estimation</h1>
+  <p class="instruction">Enter a known first duty day in "Known Day," then add a future date in "Target Date" that is beyond what the roster is currently showing. The standard 6/5 will then be applied, and you will be able to see the estimated days on and off for that period. Uncheck 6/5 for 7/6 roster results. Non-standard roster patterns or holidays will naturally throw off the estimate.</p>
   <form onsubmit="return false;">
     <label for="knownDay">Known Day:</label>
     <input type="date" id="knownDay" name="knownDay" required><br><br>
@@ -163,7 +163,7 @@
       }
 
       const resultElement = document.getElementById("result");
-      resultElement.innerHTML = "<h2>Roster Estimation</h2>";
+      resultElement.innerHTML = "<h2>Days ON and OFF lists</h2>";
       resultElement.innerHTML += "<h3>Days On:</h3>";
       resultElement.innerHTML += "<ul class='roster-list'>";
       result.daysOn.forEach((day) => {
